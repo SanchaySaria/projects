@@ -1,0 +1,65 @@
+#!/usr/local/bin/python
+
+import sys
+sys.path.append('/usr/local/Cellar/python/2.7.13/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/')
+
+import mysql.connector
+from mysql.connector import errocode
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+print "Hi this is DB class"
+
+class DB :
+  def __init__ (self, dbName, dbType) :
+    self.dbName_ = dbName
+    self.dbType_ = dbType
+    self.CreateDB()
+
+  def SetDBType(self, dbType) :
+    self.dbType_ = dbType
+
+  def GetName(self) :
+    return self.dbName_
+
+  def GetDBType(self) :
+    return self.dbType_
+
+  def CreateDB (self) :
+    logging.info("Creating data base %s", self.dbName_, " of type " +  self.dbType_)
+    conn = sqlite3.connect(self.dbName_)
+    conn.close()
+
+  def CreateTable (self, tableName, headerDict) :
+    conn = sqlite3.connect(self.dbName_)
+    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    for tab in tables :
+      if(tab[0] == tableName) :
+        logging.info("Table %s already exists in data base %s", tableName, self.dbName_)
+        return
+    logging.info("Creating table %s in data base %s", tableName, self.dbName_)
+    createTableCmd = "CREATE TABLE " + tableName + "("
+    createTableCmd += ','.join(['%s %s' % (key, val) for (key, val) in headerDict.items()])
+    createTableCmd += ");"
+    print createTableCmd
+    conn = sqlite3.connect(self.dbName_)
+    conn.execute(createTableCmd)
+
+  def AddRow (self, tableName, headerDict, rowData) :
+    conn = sqlite3.connect(self.dbName_)
+    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    isTableExist = "false"
+    for tab in tables :
+      if(tab[0] == tableName) :
+        isTableExist = "true"
+        break
+    if (isTableExist == "false") :
+      logging.error("Table %s not found in data base %s", tableName, self.dbName_)
+      return
+    addRawCmd = "INSERT INTO " + tableName + "("
+    addRawCmd += ','.join(['%s' % (key) for (key, val) in headerDict.items()])
+    addRawCmd += ") VALUES()"
+    print addRawCmd
+    conn = sqlite3.connect(self.dbName_)
+    #conn.execute(createTableCmd)
+
