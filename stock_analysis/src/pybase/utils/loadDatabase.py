@@ -2,22 +2,34 @@
 
 import sys
 import os
-import common
 import logging
 import sqlite3
-import abstractDB
-
-sys.path.append('/Users/sanchaysaria/work/financial_analysis/src/pybase/pylib/')
-sys.path.append('/Users/sanchaysaria/work/financial_analysis/src/pybase/abstractDB/')
-
-logging.basicConfig(level=logging.DEBUG)
-
-
-
 
 basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
 dataPath = basePath + "/database/data"
-indexPath = "/Users/sanchaysaria/my_git/projects/stock_analysis/database/index"
+indexPath = basePath + "/database/index"
+
+sqlite_path = basePath + "/src/pybase/sqlite/"
+
+sys.path.append(sqlite_path)
+
+import dataType
+import DB
+import DBMgr
+#import absDB
+#import abstractDB
+
+logging.basicConfig(level=logging.DEBUG)
+
+basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
+dataPath = basePath + "/database/data"
+indexPath = basePath + "/database/index"
+
+commom_path = basePath + "src/pybase/common/"
+db_path     = basePath + "src/pybase/abstractDB/"
+
+sys.path.append(commom_path)
+sys.path.append(db_path)
 
 dataTypeDict = {
   "Symbol"                      : "VARCHAR(30)",
@@ -37,8 +49,8 @@ dataTypeDict = {
   "PercentageDlyQtToTradedQty"  : "REAL"
 }
 
-def createHeaderDict(header) :
-  
+#def createHeaderDict(header) :
+#  
 
 def parseAndCreateDB(dbMgr, dbName, dbType, tableName) :
   database = dbMgr.GetDB(dbName, dbType)
@@ -63,49 +75,49 @@ def parseAndCreateDB(dbMgr, dbName, dbType, tableName) :
         print line
 
 
-
-
 # for each entry in index, create one data base. for each company.
-def createDatabase :
-  dbName = "BSE"
-  dbType = "sqlite3"
-  logging.info("Creating BSE equity data base")
+def createDatabase(dbName, dbType) :
+  logging.info("Creating " + dbName + " equity data base")
+  #dbMgr = getDatabaseMgr()
+  dbMgr = DBMgr.DBMgr()
   f_index = open(indexPath, "r")
   # TODO: trim extra spaces
   for company_name in f_index :
     parseAndCreateDB(dbMgr, dbName, dbType, company_name)
+  logging.info("Successfully created " + dbName + " equity data base")
 
+#def temp() :
+#  logging.info("Creating BSE equity data base")
+#  dbMgr = abstractDB.DBMgr()
+#  bseEqDB = dbMgr.GetDB("BSE_EQ")
+#  bseEqDB.SetDBType("sqlite3")
+#  headerDict = {
+#          "Symbol" : "VARCHAR(30)",
+#          "Series" : "VARCHAR(20)",
+#          "Date" : "DATE",
+#          "PrevClose" : "REAL",
+#          "OpenPrice" : "REAL",
+#          "HighPrice" : "REAL",
+#          "LowPrice" : "REAL",
+#          "LastPrice" : "REAL",
+#          "ClosePrice" : "REAL",
+#          "AveragePrice" : "REAL",
+#          "TotalTradedQuantity" : "REAL",
+#          "Turnover" : "REAL",
+#          "NumberOfTrades" : "REAL",
+#          "DeliverableQty" : "REAL",
+#          "PercentageDlyQtToTradedQty" : "REAL"}
+#
+#  bseEqDB.CreateTable("TATAMOTORS", headerDict)
+#  rowData = "sanchay"
+#  bseEqDB.AddRow("TATAMOTORS", headerDict, rowData)
+#  dbMgr.ExportDB("BSE_EQ", "STDOUT")
 
 def main() :
   logging.info("Creating BSE equity data base")
-  createDatabase()
-
-def temp() :
-  logging.info("Creating BSE equity data base")
-  dbMgr = abstractDB.DBMgr()
-  bseEqDB = dbMgr.GetDB("BSE_EQ")
-  bseEqDB.SetDBType("sqlite3")
-  headerDict = {
-          "Symbol" : "VARCHAR(30)",
-          "Series" : "VARCHAR(20)",
-          "Date" : "DATE",
-          "PrevClose" : "REAL",
-          "OpenPrice" : "REAL",
-          "HighPrice" : "REAL",
-          "LowPrice" : "REAL",
-          "LastPrice" : "REAL",
-          "ClosePrice" : "REAL",
-          "AveragePrice" : "REAL",
-          "TotalTradedQuantity" : "REAL",
-          "Turnover" : "REAL",
-          "NumberOfTrades" : "REAL",
-          "DeliverableQty" : "REAL",
-          "PercentageDlyQtToTradedQty" : "REAL"}
-
-  bseEqDB.CreateTable("TATAMOTORS", headerDict)
-  rowData = "sanchay"
-  bseEqDB.AddRow("TATAMOTORS", headerDict, rowData)
-  dbMgr.ExportDB("BSE_EQ", "STDOUT")
+  dbName = "BSE"
+  dbType = "sqlite3"
+  createDatabase(dbName, dbType)
 
 if ( __name__ == "__main__") :
   main()
