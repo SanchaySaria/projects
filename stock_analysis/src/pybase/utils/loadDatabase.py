@@ -4,8 +4,12 @@ import sys
 import os
 import logging
 import sqlite3
+from collections import OrderedDict
 
-basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
+logging.basicConfig(level=logging.DEBUG)
+
+basePath = "/Users/sanchaysaria/my_git/projects/stock_analysis"
+#basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
 dataPath = basePath + "/database/data"
 indexPath = basePath + "/database/index"
 
@@ -19,11 +23,6 @@ import DBMgr
 #import absDB
 #import abstractDB
 
-logging.basicConfig(level=logging.DEBUG)
-
-basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
-dataPath = basePath + "/database/data"
-indexPath = basePath + "/database/index"
 
 commom_path = basePath + "src/pybase/common/"
 db_path     = basePath + "src/pybase/abstractDB/"
@@ -45,40 +44,71 @@ dataTypeDict = {
   "TotalTradedQuantity"         : "REAL",
   "Turnover"                    : "REAL",
   "NumberOfTrades"              : "REAL",
+  "No.ofTrades"              : "REAL",
   "DeliverableQty"              : "REAL",
+  "%DlyQttoTradedQty"              : "REAL",
   "PercentageDlyQtToTradedQty"  : "REAL"
 }
 
-#def createHeaderDict(header) :
-#  
+def createHeaderDict(header) :
+  header = header.replace('\t', '')
+  header = header.replace(' ', '')
+  logging.info("Creating header dict for %s", header)
+  headerDict = OrderedDict()
+  for key in header.split(',') :
+    key = key.replace('\"', '')
+    key = key.replace('\n', '')
+    #key = key.replace('\"', '')
+    val =  dataTypeDict[key]
+    if (key == "No.ofTrades") :
+      key = "NumberOfTrades"
+    if (key == "%DlyQttoTradedQty") :
+      key = "PercentageDlyQtToTradedQty"
+    #print key + " : " + dataTypeDict[key]
+    headerDict[key] = dataTypeDict[key]
+  return headerDict
 
 def parseAndCreateDB(dbMgr, dbName, dbType, tableName) :
-  database = dbMgr.GetDB(dbName, dbType)
+  dbName = dbName.strip("\n")
+  dbType = dbType.strip("\n")
+  tableName = tableName.strip("\n")
+  bseEqDB = dbMgr.GetDB(dbName, dbType)
   # TODO: get all file for this company, check time stamp with database, if need to be created
   # if possible only add entries which are added new.
 
-  message = "Creating table for " + tableName
-  logging.info(message)
+  logging.info("Creating table for %s", tableName)
 
   company_path = dataPath + "/" + tableName
-  for root, dirs, files in os.walk(company_path):
-    for filename in files:
+  logging.info("Company path %s", company_path)
+
+  #for r, d, f in os.walk("/Users/sanchaysaria/my_git/projects/stock_analysis/database/data/TATAMOTORS") :
+  #  logging.info(r)
+  #  for dname in f :
+  #    logging.info(dname)
+
+
+  #for root, dirs, files in os.walk("/Users/sanchaysaria/my_git/projects/stock_analysis/database/data/TATAMOTORS") :
+  for root, dirs, files in os.walk(company_path) :
+    for filename in files :
+      logging.info("sanchay %s", filename)
       file_path = company_path + "/" + filename
       p_file = open(file_path, "r")
       header = p_file.readline()
       headerDict = createHeaderDict(header)
-      database.CreateTable(tableName, headerDict)
-      rowData = "sanchay"
-      bseEqDB.AddRow(tableName, headerDict, rowData)
-      dbMgr.ExportDB(dbName, dbType, "STDOUT")
-      for line in p_file :
-        print line
+      #dataTypeDict = createHeaderDict(header)
+
+      #bseEqDB .CreateTable(tableName, dataTypeDict)
+      bseEqDB .CreateTable(tableName, headerDict)
+      for rowData in p_file :
+        #print "Adding row : \n" + rowData
+        #bseEqDB.AddRow(tableName, dataTypeDict, rowData)
+        bseEqDB.AddRow(tableName, headerDict, rowData)
+  dbMgr.ExportDB(dbName, dbType, "STDOUT")
 
 
 # for each entry in index, create one data base. for each company.
 def createDatabase(dbName, dbType) :
   logging.info("Creating " + dbName + " equity data base")
-  #dbMgr = getDatabaseMgr()
   dbMgr = DBMgr.DBMgr()
   f_index = open(indexPath, "r")
   # TODO: trim extra spaces
@@ -91,7 +121,7 @@ def createDatabase(dbName, dbType) :
 #  dbMgr = abstractDB.DBMgr()
 #  bseEqDB = dbMgr.GetDB("BSE_EQ")
 #  bseEqDB.SetDBType("sqlite3")
-#  headerDict = {
+#  dataTypeDict = {
 #          "Symbol" : "VARCHAR(30)",
 #          "Series" : "VARCHAR(20)",
 #          "Date" : "DATE",
@@ -108,9 +138,9 @@ def createDatabase(dbName, dbType) :
 #          "DeliverableQty" : "REAL",
 #          "PercentageDlyQtToTradedQty" : "REAL"}
 #
-#  bseEqDB.CreateTable("TATAMOTORS", headerDict)
+#  bseEqDB.CreateTable("TATAMOTORS", dataTypeDict)
 #  rowData = "sanchay"
-#  bseEqDB.AddRow("TATAMOTORS", headerDict, rowData)
+#  bseEqDB.AddRow("TATAMOTORS", dataTypeDict, rowData)
 #  dbMgr.ExportDB("BSE_EQ", "STDOUT")
 
 def main() :
