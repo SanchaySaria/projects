@@ -1,6 +1,5 @@
 #!/usr/local/bin/python
 
-import re
 import sqlite3
 from sqlite3 import Error
 import logging
@@ -30,8 +29,6 @@ class DB :
     conn.close()
 
   def CreateTable (self, tableName, headerDict) :
-    #print "printing dict"
-    #print(headerDict)
     conn = sqlite3.connect(self.dbName_)
     getTableCmd = "SELECT name FROM sqlite_master WHERE type='table';"
     print "sqlite cmd : " + getTableCmd
@@ -45,8 +42,8 @@ class DB :
     createTableCmd += ','.join(['%s %s' % (key, val) for (key, val) in headerDict.items()])
     createTableCmd += ");"
     print "sqlite cmd : " + createTableCmd
-    conn = sqlite3.connect(self.dbName_)
     conn.execute(createTableCmd)
+    conn.close()
 
   def AddRow (self, tableName, headerDict, rowData) :
     conn = sqlite3.connect(self.dbName_)

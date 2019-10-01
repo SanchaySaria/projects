@@ -8,8 +8,8 @@ from collections import OrderedDict
 
 logging.basicConfig(level=logging.DEBUG)
 
-basePath = "/Users/sanchaysaria/my_git/projects/stock_analysis"
-#basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
+#basePath = "/Users/sanchaysaria/my_git/projects/stock_analysis"
+basePath = "/wrk/xhdhdnobkup3/sanchayk/sanchay_work/my_git/projects/stock_analysis"
 dataPath = basePath + "/database/data"
 indexPath = basePath + "/database/index"
 
@@ -103,7 +103,8 @@ def parseAndCreateDB(dbMgr, dbName, dbType, tableName) :
         #print "Adding row : \n" + rowData
         #bseEqDB.AddRow(tableName, dataTypeDict, rowData)
         bseEqDB.AddRow(tableName, headerDict, rowData)
-  dbMgr.ExportDB(dbName, dbType, "STDOUT")
+  #dbMgr.ExportDB(dbName, dbType, "STDOUT")
+  dbMgr.ExportDB(dbName, dbType, "FILE")
 
 
 # for each entry in index, create one data base. for each company.

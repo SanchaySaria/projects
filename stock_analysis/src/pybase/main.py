@@ -12,31 +12,7 @@ import abstractDB
 logging.basicConfig(level=logging.DEBUG)
 
 def main() :
-  logging.info("Creating BSE equity data base")
-  dbMgr = abstractDB.DBMgr()
-  bseEqDB = dbMgr.GetDB("BSE_EQ")
-  bseEqDB.SetDBType("sqlite3")
-  headerDict = {
-          "Symbol" : "VARCHAR(30)",
-          "Series" : "VARCHAR(20)",
-          "Date" : "DATE",
-          "PrevClose" : "REAL",
-          "OpenPrice" : "REAL",
-          "HighPrice" : "REAL",
-          "LowPrice" : "REAL",
-          "LastPrice" : "REAL",
-          "ClosePrice" : "REAL",
-          "AveragePrice" : "REAL",
-          "TotalTradedQuantity" : "REAL",
-          "Turnover" : "REAL",
-          "NumberOfTrades" : "REAL",
-          "DeliverableQty" : "REAL",
-          "PercentageDlyQtToTradedQty" : "REAL"}
-
-  bseEqDB.CreateTable("TATAMOTORS", headerDict)
-  rowData = "sanchay"
-  bseEqDB.AddRow("TATAMOTORS", headerDict, rowData)
-  dbMgr.ExportDB("BSE_EQ", "STDOUT")
+  print "Starting program"
 
 if ( __name__ == "__main__") :
   main()

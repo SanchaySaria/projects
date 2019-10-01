@@ -38,24 +38,28 @@ class DBMgr :
       logging.error("Could not find data base %s", dbName)
       return
     logging.info("Exporting data base %s to %s",dbName, exportTo)
-    if (exportTo == "STDOUT") :
+    if (exportTo == "FILE") :
+      f = open("database.txt",'w')
       logging.info("Data base %s is of type %s", dbName, self.dbList_[dbName].GetDBType())
       conn = sqlite3.connect(dbName)
       tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table';")
       for tab in tables :
-        print(tab[0])
+        f.write(tab[0])
+        f.write("\n")
+        #print(tab[0])
+        #print(tab[0])
         selectTableCmd = "select * from " + tab[0]
         rawCursor = conn.execute(selectTableCmd)
-        #print rawCursor
         header =  [description[0] for description in rawCursor.description]
-        #row =  [description[1] for description in rawCursor.description]
+        headerStr = "   ".join(header)
         print "   ".join(header)
+        f.write(headerStr)
+        f.write("\n")
+        #print "   ".join(header)
         for row in conn.execute( "select * from " + tab[0]):
-          print(row)
-        #selectTableCmd = "select COUNT(*) from " + tab[0]
-        #rawCount = conn.execute(selectTableCmd)
-        #print rawCount
-        #print(rawCursor.fetchall())
-        #print "   ".join(row)
+          f.write(str(row))
+          f.write("\n")
+          #print(row)
+          #print(row)
       conn.close()
 
